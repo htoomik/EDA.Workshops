@@ -37,7 +37,7 @@ namespace RPS.Tests
 
         public static IEnumerable<IEvent> Handle(PlayGame command, GameState state)
         {
-            return new List<IEvent>
+            var events = new List<IEvent>
             {
                 new HandShown
                 {
@@ -46,6 +46,18 @@ namespace RPS.Tests
                     PlayerId = command.PlayerId
                 }
             };
+
+            if (state.HandsShown == 2)
+            {
+                events.Add(new RoundEnded());
+            }
+
+            if (state.CurrentRound == state.Rounds)
+            {
+                events.Add(new GameEnded());
+            }
+
+            return events;
         }
     }
 }

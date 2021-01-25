@@ -3,6 +3,13 @@
     public class GameState
     {
         public string Creator { get; set; }
+        public string PlayerOne { get; set; }
+        public string PlayerTwo { get; set; }
+        public Hand PlayerOneHand { get; set; }
+        public Hand PlayerTwoHand { get; set; }
+        public int HandsShown { get; set; }
+        public int Rounds { get; set; }
+        public int CurrentRound { get; set; }
 
         public GameState When(IEvent @event)
         {
@@ -11,10 +18,32 @@
 
         public GameState When(GameCreated @event)
         {
-            return new GameState
+            Creator = @event.PlayerId;
+            Rounds = @event.Rounds;
+            return this;
+        }
+
+        public GameState When(RoundStarted @event)
+        {
+            CurrentRound = @event.Round;
+            return this;
+        }
+
+        public GameState When(HandShown @event)
+        {
+            if (@event.PlayerId == PlayerOne)
             {
-                Creator = @event.PlayerId
-            };
+                PlayerOneHand = @event.Hand;
+            }
+
+            if (@event.PlayerId == PlayerTwo)
+            {
+                PlayerTwoHand = @event.Hand;
+            }
+
+            HandsShown++;
+
+            return this;
         }
 
         public enum GameStatus
