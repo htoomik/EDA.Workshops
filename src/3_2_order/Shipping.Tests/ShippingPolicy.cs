@@ -5,19 +5,19 @@ namespace Shipping.Tests
 {
     public class App
     {
-        List<IEvent> history = new List<IEvent>();
+        private readonly List<IEvent> _history = new List<IEvent>();
 
-        public void Given(params IEvent[] events) => history.AddRange(events);
+        public void Given(params IEvent[] events) => _history.AddRange(events);
 
         public void When(IEvent @event)
         {
             var cmd = ShippingPolicy.When((dynamic)@event);
-            var state = history.Rehydrate<Order>();
-            history.AddRange(OrderBehavior.Handle(state, (dynamic)cmd));
+            var state = _history.Rehydrate<Order>();
+            _history.AddRange(OrderBehavior.Handle(state, (dynamic)cmd));
         }
 
         public void Then(Action<IEvent[]> f)
-            => f(history.ToArray());
+            => f(_history.ToArray());
     }
 
 
@@ -30,10 +30,26 @@ namespace Shipping.Tests
     public static class OrderBehavior
     {
         public static IEnumerable<IEvent> Handle(this Order order, CompletePayment command)
-            => new[] { new PaymentComplete() };
+        {
+            var events = new List<IEvent> { new PaymentComplete() };
+            if (order.Packed)
+            {
+                events.Add(new GoodsShipped());
+            }
+
+            return events;
+        }
 
         public static IEnumerable<IEvent> Handle(this Order order, CompletePacking command)
-            => new[] { new PackingComplete() };
+        {
+            var events = new List<IEvent> { new PackingComplete() };
+            if (order.Payed)
+            {
+                events.Add(new GoodsShipped());
+            }
+
+            return events;
+        }
     }
 
     public class Order
@@ -43,8 +59,16 @@ namespace Shipping.Tests
 
         public Order When(IEvent @event) => this;
 
-        public Order When(PaymentRecieved @event) => this;
-        public Order When(GoodsPicked @event) => this;
+        public Order When(PaymentRecieved @event)
+        {
+            Payed = true;
+            return this;
+        }
 
+        public Order When(GoodsPicked @event)
+        {
+            Packed = true;
+            return this;
+        }
     }
 }
