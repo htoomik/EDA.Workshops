@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Login.Tests
 {
@@ -9,19 +8,21 @@ namespace Login.Tests
     {
         public App(Func<DateTime> timeProvider)
         {
-            this.timeProvider = timeProvider;
+            _timeProvider = timeProvider;
         }
 
-        List<IEvent> history = new List<IEvent>();
-        readonly Func<DateTime> timeProvider;
+        readonly List<IEvent> _history = new List<IEvent>();
+        readonly Func<DateTime> _timeProvider;
 
-        public void Given(params IEvent[] events) => history.AddRange(events);
+        public void Given(params IEvent[] events) => _history.AddRange(events);
 
 
         public void Handle(Login command)
         {
-            if (history.ToManyAttempts(timeProvider))
+            if (_history.ToManyAttempts(_timeProvider))
+            {
                 throw new AuthenticationException("To many attempts");
+            }
         }
     }
 
@@ -29,8 +30,7 @@ namespace Login.Tests
     {
         public static bool ToManyAttempts(this IEnumerable<IEvent> events, Func<DateTime> timeProvider)
             => events
-            .OfType<AuthenticationAttemptFailed>()
-            //TODO
-            .Count() <= 3;
+                .OfType<AuthenticationAttemptFailed>()
+                .Count(e => timeProvider().Subtract(e.Time).TotalMinutes < 15) >= 3;
     }
 }

@@ -8,7 +8,7 @@ namespace Login.Tests
     public class LoginTests
     {
         [Fact]
-        public void ThreeFailedAttemptsLast16MinutesSucceceeds()
+        public void ThreeFailedAttemptsLast16MinutesSucceeds()
         {
             var app = new App(() => DateTime.Parse("2020-06-01 13:30"));
             var time = DateTime.Parse("2020-06-01 13:15");
@@ -25,7 +25,7 @@ namespace Login.Tests
         }
 
         [Fact]
-        public void ThreeFailedAttemptsLast15minutesThrows()
+        public void ThreeFailedAttemptsLast15MinutesThrows()
         {
             var app = new App(() => DateTime.Parse("2020-06-01 13:30"));
             var time = DateTime.Parse("2020-06-01 13:15");
