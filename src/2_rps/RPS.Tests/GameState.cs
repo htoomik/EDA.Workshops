@@ -2,7 +2,20 @@
 {
     public class GameState
     {
-        public GameState When(IEvent @event) => this;
+        public string Creator { get; set; }
+
+        public GameState When(IEvent @event)
+        {
+            return this;
+        }
+
+        public GameState When(GameCreated @event)
+        {
+            return new GameState
+            {
+                Creator = @event.PlayerId
+            };
+        }
 
         public enum GameStatus
         {
@@ -12,5 +25,4 @@
             Ended = 50
         }
     }
-
 }

@@ -7,12 +7,45 @@ namespace RPS.Tests
     public static class Game
     {
         public static IEnumerable<IEvent> Handle(CreateGame command, GameState state)
-            => Array.Empty<IEvent>();
+        {
+            return new List<IEvent>
+            {
+                new GameCreated
+                {
+                    GameId = command.GameId,
+                    PlayerId = command.PlayerId,
+                    Rounds = command.Rounds,
+                    Title = command.Title,
+                }
+            };
+        }
 
         public static IEnumerable<IEvent> Handle(JoinGame command, GameState state)
-            => Array.Empty<IEvent>();
+        {
+            // You cannot play against yourself
+            if (state.Creator == command.PlayerId)
+            {
+                return new List<IEvent>();
+            }
+
+            return new List<IEvent>
+            {
+                new GameStarted(),
+                new RoundStarted()
+            };
+        }
 
         public static IEnumerable<IEvent> Handle(PlayGame command, GameState state)
-            => Array.Empty<IEvent>();
+        {
+            return new List<IEvent>
+            {
+                new HandShown
+                {
+                    GameId = command.GameId,
+                    Hand = command.Hand,
+                    PlayerId = command.PlayerId
+                }
+            };
+        }
     }
 }

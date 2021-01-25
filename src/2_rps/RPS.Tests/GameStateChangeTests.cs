@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace RPS.Tests
@@ -19,7 +18,7 @@ namespace RPS.Tests
                 new CreateGame { Rounds = 3, GameId = Guid.NewGuid(), PlayerId = "tester", Title = "Test Game" },
                 state);
 
-            //Then  
+            //Then
             Assert.True(events.OfType<GameCreated>().Any());
         }
 
@@ -38,7 +37,7 @@ namespace RPS.Tests
                 new JoinGame { GameId = gameId, PlayerId = "test2@tester.com" },
                 state);
 
-            //Then  
+            //Then
             Assert.True(events.OfType<GameStarted>().Any());
             Assert.True(events.OfType<RoundStarted>().Any());
         }
@@ -58,12 +57,12 @@ namespace RPS.Tests
                 new JoinGame { GameId = gameId, PlayerId = "test@tester.com" },
                 state);
 
-            //Then  
+            //Then
             Assert.False(events.Any());
         }
 
         [Fact]
-        public void Handshown()
+        public void HandShown()
         {
             var gameId = Guid.NewGuid();
 
@@ -80,7 +79,7 @@ namespace RPS.Tests
                 state
                 );
 
-            //Then  
+            //Then
             Assert.True(events.OfType<HandShown>().Any());
         }
 
@@ -103,7 +102,7 @@ namespace RPS.Tests
                 state
                 );
 
-            //Then  
+            //Then
             Assert.True(events.OfType<RoundEnded>().All(x => x.Winner == "test@tester.com"), "Wrong winner");
             Assert.True(events.OfType<GameEnded>().Any(), "No game end");
         }
