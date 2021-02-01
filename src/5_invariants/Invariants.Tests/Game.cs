@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Invariants.Tests
@@ -19,8 +20,13 @@ namespace Invariants.Tests
 
         public static IEnumerable<IEvent> Handle(JoinGame command, IEvent[] events)
         {
-            var state = events.Rehydrate<GameState>();
-            return Handle(command, state);
+            if (events.Any(e => e is GameCreated gce && gce.PlayerId == command.PlayerId))
+            {
+                yield break;
+            }
+
+            yield return new GameStarted { GameId = command.GameId, PlayerId = command.PlayerId };
+            yield return new RoundStarted { GameId = command.GameId, Round = 1 };
         }
     }
 }
