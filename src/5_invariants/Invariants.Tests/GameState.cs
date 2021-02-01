@@ -2,7 +2,14 @@
 {
     public class GameState
     {
-        public GameState When(IEvent @event) => this;
-    }
+        public string Creator { get; set; }
 
+        public GameState When(IEvent @event) => this;
+
+        public GameState When(GameCreated @event)
+        {
+            Creator = @event.PlayerId;
+            return this;
+        }
+    }
 }
